@@ -1,0 +1,37 @@
+name: ModDroid Games Metadata
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "scraper.py"
+      - ".github/workflows/scrape.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Get repository files
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run metadata scraper
+        run: python scraper.py
+
+      - name: Save results for download
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: moddroid-games-metadata
+          path: games-metadata.txt
+          if-no-files-found: warn
+          retention-days: 7
